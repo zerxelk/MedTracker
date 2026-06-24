@@ -1,36 +1,16 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MedTracker
 
-## Getting Started
+I built this because medication info is scattered across pharmacy labels, sketchy WebMD pages, and pamphlets nobody reads. MedTracker is one place to keep the medications you actually take, with the official FDA information for each one and a check for whether any of them call out each other in their warning labels.
 
-First, run the development server:
+You search a drug, the app pulls its label data from the openFDA API, and it shows up as a card. Click the card and you see what it's for, the FDA's dosing instructions, and the warnings — broken into readable sections instead of one giant block of legalese. If you have multiple medications added, the detail view scans each one's warnings for mentions of the others. If Tylenol's label says "ask a doctor before use if you are taking the blood thinning drug warfarin" and you've got warfarin in your list, you see that warning surfaced right at the top, with the exact FDA quote as evidence.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The interaction check isn't a substitute for a pharmacist. It only catches what the FDA explicitly names in label text, so it'll miss things. The app is upfront about that.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Built with Next.js 16, TypeScript, Tailwind, shadcn/ui, and Framer Motion. Data from the openFDA Drug Label API. State persists to localStorage.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To run it locally:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+    npm install
+    npm run dev
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Then open http://localhost:3000.

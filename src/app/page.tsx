@@ -18,6 +18,7 @@ import { Pill, Plus, Sparkles, ChevronDown, Trash2, Settings as SettingsIcon } f
 import { AnimatePresence } from 'framer-motion';
 import { detectInteractions } from '@/lib/interactions';
 import { TodayOverview } from '@/components/TodayOverview';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function Home() {
     const [meds, setMeds] = useState<Medication[]>([]);
@@ -76,24 +77,25 @@ export default function Home() {
         : 0;
 
     return (
-        <div className="min-h-screen bg-stone-50">
+        <div className="min-h-screen bg-stone-50 dark:bg-stone-950 transition-colors">
             {/* Header */}
-            <header className="bg-stone-50/80 backdrop-blur-md border-b border-stone-200/60 sticky top-0 z-10">
+            <header className="bg-stone-50/80 dark:bg-stone-950/80 backdrop-blur-md border-b border-stone-200/60 dark:border-stone-800/60 sticky top-0 z-10">
                 <div className="max-w-5xl mx-auto px-6 py-3.5 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                        <div className="rounded-lg bg-stone-900 p-1.5">
-                            <Pill className="h-4 w-4 text-stone-50" />
+                        <div className="rounded-lg bg-stone-900 dark:bg-stone-50 p-1.5">
+                            <Pill className="h-4 w-4 text-stone-50 dark:text-stone-900" />
                         </div>
-                        <span className="text-base font-semibold text-stone-900 tracking-tight">
+                        <span className="text-base font-semibold text-stone-900 dark:text-stone-50 tracking-tight">
                             MedTracker
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
+                        <ThemeToggle />
                         <Button
                             onClick={() => setSettingsOpen(true)}
                             size="sm"
                             variant="ghost"
-                            className="text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg"
+                            className="text-stone-600 hover:text-stone-900 hover:bg-stone-100 dark:text-stone-400 dark:hover:text-stone-100 dark:hover:bg-stone-800 rounded-lg"
                             aria-label="Settings"
                         >
                             <SettingsIcon className="h-4 w-4" />
@@ -101,7 +103,7 @@ export default function Home() {
                         <Button
                             onClick={() => setDialogOpen(true)}
                             size="sm"
-                            className="bg-stone-900 hover:bg-stone-800 text-stone-50 rounded-lg"
+                            className="bg-stone-900 hover:bg-stone-800 text-stone-50 dark:bg-stone-50 dark:hover:bg-stone-200 dark:text-stone-900 rounded-lg"
                         >
                             <Plus className="h-4 w-4 mr-1" />
                             Add medication
@@ -111,42 +113,42 @@ export default function Home() {
             </header>
 
             {/* Hero */}
-            <section className="relative overflow-hidden border-b border-stone-200/60">
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-50/40 via-stone-50 to-amber-50/30 pointer-events-none" />
+            <section className="relative overflow-hidden border-b border-stone-200/60 dark:border-stone-800/60">
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-50/40 via-stone-50 to-amber-50/30 dark:from-orange-950/20 dark:via-stone-950 dark:to-amber-950/10 pointer-events-none" />
                 <div
-                    className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-orange-100/40 blur-3xl pointer-events-none"
+                    className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-orange-100/40 dark:bg-orange-900/20 blur-3xl pointer-events-none"
                     aria-hidden
                 />
                 <div
-                    className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-amber-100/30 blur-3xl pointer-events-none"
+                    className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-amber-100/30 dark:bg-amber-900/10 blur-3xl pointer-events-none"
                     aria-hidden
                 />
 
                 <div className="relative max-w-5xl mx-auto px-6 py-20 sm:py-28">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-white/60 backdrop-blur-sm border border-stone-200/80 px-3 py-1 text-xs text-stone-600 mb-6">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-white/60 dark:bg-stone-900/60 backdrop-blur-sm border border-stone-200/80 dark:border-stone-800/80 px-3 py-1 text-xs text-stone-600 dark:text-stone-400 mb-6">
                         <Sparkles className="h-3 w-3" />
                         Powered by openFDA data
                     </div>
 
-                    <h1 className="text-5xl sm:text-7xl font-semibold text-stone-900 tracking-tight leading-[1.05] max-w-3xl">
+                    <h1 className="text-5xl sm:text-7xl font-semibold text-stone-900 dark:text-stone-50 tracking-tight leading-[1.05] max-w-3xl">
                         A med tracker
                         <br />
-                        <span className="text-stone-400">to know your meds.</span>
+                        <span className="text-stone-400 dark:text-stone-600">to know your meds.</span>
                     </h1>
 
-                    <p className="text-base sm:text-lg text-stone-600 mt-8 max-w-xl leading-relaxed">
+                    <p className="text-base sm:text-lg text-stone-600 dark:text-stone-400 mt-8 max-w-xl leading-relaxed">
                         Search the FDA database, track your daily doses, and get warned when your medications interact. All in one place.
                     </p>
 
                     {mounted && meds.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-3 mt-8 text-sm text-stone-600">
+                        <div className="flex flex-wrap items-center gap-3 mt-8 text-sm text-stone-600 dark:text-stone-400">
                             <span>
                                 Tracking {meds.length} medication{meds.length === 1 ? '' : 's'}
                             </span>
                             {totalInteractions > 0 && (
                                 <>
-                                    <div className="h-1 w-1 rounded-full bg-stone-400" />
-                                    <span className="text-orange-700">
+                                    <div className="h-1 w-1 rounded-full bg-stone-400 dark:bg-stone-600" />
+                                    <span className="text-orange-700 dark:text-orange-400">
                                         {totalInteractions} interaction
                                         {totalInteractions === 1 ? '' : 's'} detected
                                     </span>
@@ -171,11 +173,11 @@ export default function Home() {
                 {/* Medications grid */}
                 <div>
                     <div className="mb-6 flex items-baseline justify-between">
-                        <h2 className="text-lg font-semibold text-stone-900 tracking-tight">
+                        <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-50 tracking-tight">
                             My medications
                         </h2>
                         {mounted && meds.length > 0 && (
-                            <span className="text-xs text-stone-500">
+                            <span className="text-xs text-stone-500 dark:text-stone-500">
                                 Saved on this device
                             </span>
                         )}
@@ -188,20 +190,20 @@ export default function Home() {
                             <MedicationCardSkeleton />
                         </div>
                     ) : meds.length === 0 ? (
-                        <div className="text-center py-20 px-6 rounded-2xl bg-white border border-stone-200/80">
-                            <div className="inline-flex rounded-2xl bg-stone-100 p-3.5 mb-5">
-                                <Pill className="h-6 w-6 text-stone-600" />
+                        <div className="text-center py-20 px-6 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800/80">
+                            <div className="inline-flex rounded-2xl bg-stone-100 dark:bg-stone-800 p-3.5 mb-5">
+                                <Pill className="h-6 w-6 text-stone-600 dark:text-stone-400" />
                             </div>
-                            <h3 className="text-stone-900 font-semibold text-base">
+                            <h3 className="text-stone-900 dark:text-stone-50 font-semibold text-base">
                                 Nothing here yet
                             </h3>
-                            <p className="text-sm text-stone-500 mt-1.5 mb-6 max-w-sm mx-auto">
+                            <p className="text-sm text-stone-500 dark:text-stone-400 mt-1.5 mb-6 max-w-sm mx-auto">
                                 Search a medication to add it. We&rsquo;ll pull the FDA label
                                 data and watch for interactions automatically.
                             </p>
                             <Button
                                 onClick={() => setDialogOpen(true)}
-                                className="bg-stone-900 hover:bg-stone-800 text-stone-50 rounded-lg"
+                                className="bg-stone-900 hover:bg-stone-800 text-stone-50 dark:bg-stone-50 dark:hover:bg-stone-200 dark:text-stone-900 rounded-lg"
                             >
                                 <Plus className="h-4 w-4 mr-1" />
                                 Add your first medication
@@ -225,28 +227,28 @@ export default function Home() {
                 </div>
 
                 {/* How interaction detection works */}
-                <div className="rounded-2xl border border-stone-200/80 bg-white overflow-hidden">
+                <div className="rounded-2xl border border-stone-200/80 dark:border-stone-800/80 bg-white dark:bg-stone-900 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => setHowItWorksOpen((o) => !o)}
-                        className="w-full flex items-center justify-between p-5 text-left hover:bg-stone-50 transition-colors"
+                        className="w-full flex items-center justify-between p-5 text-left hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                     >
                         <div>
-                            <h3 className="text-sm font-semibold text-stone-900">
+                            <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">
                                 How interaction detection works
                             </h3>
-                            <p className="text-xs text-stone-500 mt-0.5">
+                            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                                 A quick look under the hood
                             </p>
                         </div>
                         <ChevronDown
-                            className={`h-4 w-4 text-stone-500 transition-transform ${
+                            className={`h-4 w-4 text-stone-500 dark:text-stone-400 transition-transform ${
                                 howItWorksOpen ? 'rotate-180' : ''
                             }`}
                         />
                     </button>
                     {howItWorksOpen && (
-                        <div className="px-5 pb-5 pt-1 text-sm text-stone-600 leading-relaxed space-y-3 border-t border-stone-100">
+                        <div className="px-5 pb-5 pt-1 text-sm text-stone-600 dark:text-stone-400 leading-relaxed space-y-3 border-t border-stone-100 dark:border-stone-800">
                             <p>
                                 For each medication you add, MedTracker pulls the full FDA
                                 label data from the openFDA Drug Label API — including the
@@ -272,22 +274,22 @@ export default function Home() {
             </main>
 
             {/* Footer */}
-            <footer className="border-t border-stone-200/60 bg-stone-50/50">
+            <footer className="border-t border-stone-200/60 dark:border-stone-800/60 bg-stone-50/50 dark:bg-stone-950/50">
                 <div className="max-w-5xl mx-auto px-6 py-8 space-y-4">
-                    <p className="text-xs text-stone-500 text-center max-w-md mx-auto leading-relaxed">
+                    <p className="text-xs text-stone-500 dark:text-stone-400 text-center max-w-md mx-auto leading-relaxed">
                         For informational tracking only. Not medical advice. Interaction
                         detection is best-effort and based on FDA label text. Always consult
                         a healthcare provider.
                     </p>
-                    <div className="flex items-center justify-center gap-4 text-xs text-stone-400">
+                    <div className="flex items-center justify-center gap-4 text-xs text-stone-400 dark:text-stone-500">
                         <span>&copy; {new Date().getFullYear()} MedTracker</span>
                         <span>·</span>
-                    <a
+                        <a
                         href="https://github.com/zerxelk/MedTracker"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-stone-700 transition-colors"
-                    >
+                        className="hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
+                        >
                         GitHub
                     </a>
                     <span>·</span>
@@ -295,14 +297,13 @@ export default function Home() {
                     href="https://github.com/zerxelk/MedTracker/blob/main/LICENSE"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-stone-700 transition-colors"
+                    className="hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
                     >
                     MIT License
                 </a>
         </div>
 </div>
 </footer>
-
 
     <AddMedicationDialog
         open={dialogOpen}
@@ -320,23 +321,23 @@ export default function Home() {
     {/* Settings dialog */}
     {settingsOpen && (
         <div
-            className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/40 dark:bg-black/60 flex items-center justify-center p-4"
             onClick={() => setSettingsOpen(false)}
         >
             <div
-                className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl"
+                className="bg-white dark:bg-stone-900 border border-transparent dark:border-stone-800 rounded-2xl max-w-md w-full p-6 shadow-xl"
                 onClick={(e) => e.stopPropagation()}
             >
-                <h2 className="text-lg font-semibold text-stone-900 mb-1">Settings</h2>
-                <p className="text-sm text-stone-500 mb-6">
+                <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-50 mb-1">Settings</h2>
+                <p className="text-sm text-stone-500 dark:text-stone-400 mb-6">
                     Manage your data
                 </p>
 
-                <div className="rounded-xl border border-red-200 bg-red-50/50 p-4">
-                    <h3 className="text-sm font-medium text-stone-900 mb-1">
+                <div className="rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50/50 dark:bg-red-950/20 p-4">
+                    <h3 className="text-sm font-medium text-stone-900 dark:text-stone-50 mb-1">
                         Clear all data
                     </h3>
-                    <p className="text-xs text-stone-600 mb-3 leading-relaxed">
+                    <p className="text-xs text-stone-600 dark:text-stone-400 mb-3 leading-relaxed">
                         Permanently delete all medications and dose history from
                         this device. Cannot be undone.
                     </p>
@@ -344,7 +345,7 @@ export default function Home() {
                         onClick={handleClearAll}
                         size="sm"
                         variant="outline"
-                        className="border-red-300 text-red-700 hover:bg-red-100 hover:text-red-800"
+                        className="border-red-300 dark:border-red-900/60 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/40 hover:text-red-800 dark:hover:text-red-300"
                     >
                         <Trash2 className="h-3.5 w-3.5 mr-1.5" />
                         Delete everything
@@ -356,6 +357,7 @@ export default function Home() {
                         onClick={() => setSettingsOpen(false)}
                         variant="ghost"
                         size="sm"
+                        className="dark:text-stone-300 dark:hover:bg-stone-800"
                     >
                         Close
                     </Button>

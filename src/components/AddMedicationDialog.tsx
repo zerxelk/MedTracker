@@ -34,9 +34,8 @@ export function AddMedicationDialog({
     const [dosage, setDosage] = useState('');
     const [notes, setNotes] = useState('');
 
-    // Schedule fields
     const [frequency, setFrequency] = useState<ScheduleFrequency>('once');
-    const [durationDays, setDurationDays] = useState<string>(''); // empty = ongoing
+    const [durationDays, setDurationDays] = useState<string>('');
     const [instructions, setInstructions] = useState('');
 
     useEffect(() => {
@@ -96,12 +95,12 @@ export function AddMedicationDialog({
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800">
                 <DialogHeader>
-                    <DialogTitle>
+                    <DialogTitle className="text-stone-900 dark:text-stone-50">
                         {selected ? 'Add to your list' : 'Find a medication'}
                     </DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-stone-500 dark:text-stone-400">
                         {selected
                             ? 'Set your dosage and schedule.'
                             : 'Search the FDA database for your medication.'}
@@ -109,34 +108,34 @@ export function AddMedicationDialog({
                 </DialogHeader>
 
                 {!selected ? (
-                    // Step 1: Search
+                    // Search
                     <div className="space-y-4">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 dark:text-stone-500" />
                             <Input
                                 autoFocus
                                 placeholder="Try 'Tylenol' or 'Ibuprofen'..."
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
-                                className="pl-9"
+                                className="pl-9 bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-50 placeholder:text-stone-400 dark:placeholder:text-stone-500"
                             />
                         </div>
 
                         <div className="min-h-[200px] max-h-[300px] overflow-y-auto -mx-1 px-1">
                             {loading && (
-                                <div className="flex items-center justify-center py-8 text-stone-400">
+                                <div className="flex items-center justify-center py-8 text-stone-400 dark:text-stone-500">
                                     <Loader2 className="h-5 w-5 animate-spin" />
                                 </div>
                             )}
 
                             {!loading && query && results.length === 0 && (
-                                <p className="text-center text-sm text-stone-500 py-8">
+                                <p className="text-center text-sm text-stone-500 dark:text-stone-400 py-8">
                                     No medications found. Try a different name.
                                 </p>
                             )}
 
                             {!loading && !query && (
-                                <p className="text-center text-sm text-stone-400 py-8">
+                                <p className="text-center text-sm text-stone-400 dark:text-stone-500 py-8">
                                     Start typing to search...
                                 </p>
                             )}
@@ -146,21 +145,21 @@ export function AddMedicationDialog({
                                     <button
                                         key={i}
                                         onClick={() => setSelected(drug)}
-                                        className="w-full text-left p-3 rounded-md border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-colors"
+                                        className="w-full text-left p-3 rounded-md border border-stone-200 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-500 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors"
                                     >
                                         <div className="flex items-start gap-3">
-                                            <Pill className="h-4 w-4 mt-0.5 text-stone-600 shrink-0" />
+                                            <Pill className="h-4 w-4 mt-0.5 text-stone-600 dark:text-stone-400 shrink-0" />
                                             <div className="min-w-0">
-                                                <p className="font-medium text-sm capitalize">
+                                                <p className="font-medium text-sm capitalize text-stone-900 dark:text-stone-50">
                                                     {(drug.brandName || drug.genericName || 'Unknown').toLowerCase()}
                                                 </p>
                                                 {drug.genericName && drug.brandName && (
-                                                    <p className="text-xs text-stone-500 capitalize">
+                                                    <p className="text-xs text-stone-500 dark:text-stone-400 capitalize">
                                                         {drug.genericName.toLowerCase()}
                                                     </p>
                                                 )}
                                                 {drug.purpose && (
-                                                    <p className="text-xs text-stone-500 mt-1 line-clamp-1">
+                                                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 line-clamp-1">
                                                         {drug.purpose}
                                                     </p>
                                                 )}
@@ -172,50 +171,50 @@ export function AddMedicationDialog({
                         </div>
                     </div>
                 ) : (
-                    // Step 2: Details + Schedule
+                    // Schedule + details
                     <div className="space-y-4">
                         <button
                             onClick={() => setSelected(null)}
-                            className="flex items-center gap-1 text-sm text-stone-500 hover:text-stone-900"
+                            className="flex items-center gap-1 text-sm text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100"
                         >
                             <ArrowLeft className="h-3 w-3" />
                             Back to search
                         </button>
 
-                        <div className="rounded-lg bg-stone-50 border border-stone-200 p-3">
-                            <p className="font-medium text-sm capitalize">
+                        <div className="rounded-lg bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 p-3">
+                            <p className="font-medium text-sm capitalize text-stone-900 dark:text-stone-50">
                                 {(selected.brandName || selected.genericName || '').toLowerCase()}
                             </p>
                             {selected.purpose && (
-                                <p className="text-xs text-stone-600 mt-1">{selected.purpose}</p>
+                                <p className="text-xs text-stone-600 dark:text-stone-400 mt-1">{selected.purpose}</p>
                             )}
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="dosage">Dosage</Label>
+                            <Label htmlFor="dosage" className="text-stone-700 dark:text-stone-300">Dosage</Label>
                             <Input
                                 id="dosage"
                                 placeholder="e.g. 500mg, 2 tablets"
                                 value={dosage}
                                 onChange={(e) => setDosage(e.target.value)}
+                                className="bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-50 placeholder:text-stone-400 dark:placeholder:text-stone-500"
                             />
                         </div>
 
-                        {/* Schedule */}
-                        <div className="pt-2 border-t border-stone-200">
+                        <div className="pt-2 border-t border-stone-200 dark:border-stone-800">
                             <div className="flex items-center gap-2 mb-3">
-                                <Clock className="h-4 w-4 text-stone-500" />
-                                <h4 className="text-sm font-medium text-stone-900">Schedule</h4>
+                                <Clock className="h-4 w-4 text-stone-500 dark:text-stone-400" />
+                                <h4 className="text-sm font-medium text-stone-900 dark:text-stone-50">Schedule</h4>
                             </div>
 
                             <div className="space-y-3">
                                 <div className="space-y-2">
-                                    <Label htmlFor="frequency">How often?</Label>
+                                    <Label htmlFor="frequency" className="text-stone-700 dark:text-stone-300">How often?</Label>
                                     <select
                                         id="frequency"
                                         value={frequency}
                                         onChange={(e) => setFrequency(e.target.value as ScheduleFrequency)}
-                                        className="w-full h-9 rounded-md border border-stone-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900/10 focus:border-stone-400"
+                                        className="w-full h-9 rounded-md border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900/10 dark:focus:ring-stone-100/10 focus:border-stone-400 dark:focus:border-stone-500"
                                     >
                                         {Object.entries(FREQUENCY_LABELS).map(([value, label]) => (
                                             <option key={value} value={value}>
@@ -226,7 +225,7 @@ export function AddMedicationDialog({
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="duration">Duration (days)</Label>
+                                    <Label htmlFor="duration" className="text-stone-700 dark:text-stone-300">Duration (days)</Label>
                                     <Input
                                         id="duration"
                                         type="number"
@@ -234,38 +233,45 @@ export function AddMedicationDialog({
                                         placeholder="Leave empty for ongoing"
                                         value={durationDays}
                                         onChange={(e) => setDurationDays(e.target.value)}
+                                        className="bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-50 placeholder:text-stone-400 dark:placeholder:text-stone-500"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="instructions">Instructions (optional)</Label>
+                                    <Label htmlFor="instructions" className="text-stone-700 dark:text-stone-300">Instructions (optional)</Label>
                                     <Input
                                         id="instructions"
                                         placeholder="e.g. after meals, with water"
                                         value={instructions}
                                         onChange={(e) => setInstructions(e.target.value)}
+                                        className="bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-50 placeholder:text-stone-400 dark:placeholder:text-stone-500"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="notes">Notes (optional)</Label>
+                            <Label htmlFor="notes" className="text-stone-700 dark:text-stone-300">Notes (optional)</Label>
                             <Input
                                 id="notes"
                                 placeholder="Anything else..."
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
+                                className="bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-50 placeholder:text-stone-400 dark:placeholder:text-stone-500"
                             />
                         </div>
 
                         <div className="flex gap-2 pt-2">
-                            <Button variant="outline" onClick={() => handleClose(false)} className="flex-1">
+                            <Button
+                                variant="outline"
+                                onClick={() => handleClose(false)}
+                                className="flex-1 border-stone-200 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
+                            >
                                 Cancel
                             </Button>
                             <Button
                                 onClick={handleAdd}
-                                className="flex-1 bg-stone-900 hover:bg-stone-800 text-stone-50"
+                                className="flex-1 bg-stone-900 hover:bg-stone-800 text-stone-50 dark:bg-stone-50 dark:hover:bg-stone-200 dark:text-stone-900"
                             >
                                 Add to my list
                             </Button>

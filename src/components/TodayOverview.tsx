@@ -29,7 +29,6 @@ export function TodayOverview({
                               }: TodayOverviewProps) {
     const today = todayKey();
 
-    // Gather all of today's doses across all medications
     const todayDoses: TodayDose[] = [];
     for (const med of medications) {
         if (!med.schedule) continue;
@@ -59,17 +58,17 @@ export function TodayOverview({
         <div>
             <div className="mb-6 flex items-baseline justify-between">
                 <div>
-                    <h2 className="text-lg font-semibold text-stone-900 tracking-tight">
+                    <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-50 tracking-tight">
                         Today
                     </h2>
-                    <p className="text-xs text-stone-500 mt-1">
+                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
                         {allDone
                             ? `All ${todayDoses.length} dose${todayDoses.length === 1 ? '' : 's'} taken `
                             : `${takenCount} of ${todayDoses.length} dose${todayDoses.length === 1 ? '' : 's'} taken`}
                         {allDone && '✨'}
                     </p>
                 </div>
-                <span className="text-xs text-stone-500">
+                <span className="text-xs text-stone-500 dark:text-stone-400">
           {new Date().toLocaleDateString(undefined, {
               weekday: 'long',
               month: 'short',
@@ -95,7 +94,6 @@ export function TodayOverview({
     );
 }
 
-// ─── A single dose row ───
 interface DoseRowProps {
     dose: TodayDose;
     index: number;
@@ -125,12 +123,11 @@ function DoseRow({ dose, index, onToggle, onView }: DoseRowProps) {
             transition={{ duration: 0.2, delay: index * 0.04 }}
             className={`group flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
                 taken
-                    ? 'bg-green-50/60 border-green-200/60'
-                    : 'bg-white border-stone-200/80 hover:border-stone-300'
+                    ? 'bg-green-50/60 dark:bg-green-950/20 border-green-200/60 dark:border-green-900/40'
+                    : 'bg-white dark:bg-stone-900 border-stone-200/80 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'
             }`}
             onClick={onView}
         >
-            {/* Big tap target on the left */}
             <button
                 type="button"
                 onClick={(e) => {
@@ -140,27 +137,28 @@ function DoseRow({ dose, index, onToggle, onView }: DoseRowProps) {
                 className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all ${
                     taken
                         ? 'bg-green-500 hover:bg-green-600 text-white'
-                        : 'border-2 border-stone-300 hover:border-stone-900 hover:bg-stone-50'
+                        : 'border-2 border-stone-300 dark:border-stone-700 hover:border-stone-900 dark:hover:border-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
                 }`}
                 aria-label={taken ? 'Mark as not taken' : 'Mark as taken'}
             >
                 {taken ? (
                     <Check className="h-4 w-4" strokeWidth={3} />
                 ) : (
-                    <Pill className="h-4 w-4 text-stone-500" />
+                    <Pill className="h-4 w-4 text-stone-500 dark:text-stone-400" />
                 )}
             </button>
 
-            {/* Med info */}
             <div className="min-w-0 flex-1">
                 <p
                     className={`text-sm font-medium capitalize truncate ${
-                        taken ? 'text-stone-600 line-through decoration-stone-400/60' : 'text-stone-900'
+                        taken
+                            ? 'text-stone-600 dark:text-stone-400 line-through decoration-stone-400/60 dark:decoration-stone-500/60'
+                            : 'text-stone-900 dark:text-stone-50'
                     }`}
                 >
                     {displayName.toLowerCase()}
                 </p>
-                <div className="flex items-center gap-2 text-xs text-stone-500 mt-0.5">
+                <div className="flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                     {medication.dosage && <span>{medication.dosage}</span>}
                     {medication.dosage && <span>·</span>}
                     <span className="flex items-center gap-1">

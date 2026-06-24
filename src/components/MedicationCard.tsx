@@ -1,4 +1,3 @@
-// src/components/MedicationCard.tsx
 'use client';
 
 import { motion } from 'framer-motion';
@@ -35,22 +34,22 @@ export function MedicationCard({
         >
             <Card
                 onClick={() => onView(medication)}
-                className="group relative cursor-pointer bg-white border-stone-200/80 rounded-2xl shadow-none hover:shadow-md hover:border-stone-300 transition-all"
+                className="group relative cursor-pointer bg-white dark:bg-stone-900 border-stone-200/80 dark:border-stone-800 rounded-2xl shadow-none hover:shadow-md dark:hover:shadow-stone-950/50 hover:border-stone-300 dark:hover:border-stone-700 transition-all"
             >
                 <CardHeader className="pb-2.5">
                     <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="rounded-xl bg-stone-100 p-2 shrink-0">
-                                <Pill className="h-4 w-4 text-stone-600" />
+                            <div className="rounded-xl bg-stone-100 dark:bg-stone-800 p-2 shrink-0">
+                                <Pill className="h-4 w-4 text-stone-600 dark:text-stone-400" />
                             </div>
-                            <CardTitle className="text-base font-semibold text-stone-900 truncate capitalize tracking-tight">
+                            <CardTitle className="text-base font-semibold text-stone-900 dark:text-stone-50 truncate capitalize tracking-tight">
                                 {displayName.toLowerCase()}
                             </CardTitle>
                         </div>
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-stone-400 hover:text-red-600 hover:bg-red-50 -mr-1"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-stone-400 hover:text-red-600 hover:bg-red-50 dark:text-stone-500 dark:hover:text-red-400 dark:hover:bg-red-950/30 -mr-1"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onDelete(medication.id);
@@ -63,16 +62,16 @@ export function MedicationCard({
                 </CardHeader>
                 <CardContent className="space-y-2">
                     {medication.dosage && (
-                        <p className="text-sm text-stone-700 font-medium">
+                        <p className="text-sm text-stone-700 dark:text-stone-300 font-medium">
                             {medication.dosage}
                         </p>
                     )}
                     {medication.fdaData?.purpose && (
-                        <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-stone-500 dark:text-stone-500 line-clamp-2 leading-relaxed">
                             {medication.fdaData.purpose}
                         </p>
                     )}
-                    <div className="flex items-center gap-1 text-xs text-stone-600 font-medium pt-2 group-hover:gap-1.5 transition-all">
+                    <div className="flex items-center gap-1 text-xs text-stone-600 dark:text-stone-400 font-medium pt-2 group-hover:gap-1.5 transition-all">
                         View details
                         <ArrowUpRight className="h-3 w-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </div>

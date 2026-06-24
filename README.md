@@ -1,6 +1,12 @@
 # MedTracker
 
-A personal medication tracker that pulls real drug information from the openFDA API and flags potential interactions between the medications in your list. Search any prescription or OTC drug, see the FDA's official purpose, dosing, warnings, and side effects, and get warned when the FDA label of one of your meds explicitly mentions another med you're tracking.
+A medication tracking application that integrates with the U.S. Food and Drug Administration's openFDA Drug Label API to provide users with authoritative drug information and detect potential drug-drug interactions within a user's medication list.
+
+## Overview
+
+MedTracker allows users to maintain a personal list of medications and view the corresponding FDA-published label information for each. When multiple medications are present, the application analyzes the official warning text of each medication for references to other medications in the user's list, surfacing potential interactions alongside the original FDA-sourced text as evidence.
+
+The interaction detection is text-based and limited to interactions explicitly named in FDA label documentation. It is not a substitute for professional clinical interaction checkers or pharmacist review.
 
 ## Built With
 
@@ -8,27 +14,32 @@ A personal medication tracker that pulls real drug information from the openFDA 
 - TypeScript
 - Tailwind CSS
 - shadcn/ui
-- Framer Motion
-- Lucide React
 - openFDA Drug Label API
 
 ## Features
 
-- **FDA search** — Search the openFDA drug label database for any prescription or OTC medication
-- **Personal med list** — Add medications with your own dosage and notes; persisted to localStorage
-- **Detail view** — Purpose, indications, official FDA dosing, warnings, side effects
-- **Interaction detection** — Scans FDA warning text for other meds in your list, surfaces the exact FDA quote
-- **Polished UI** — Animated cards, skeleton loading states, responsive grid
+- **FDA medication search** — Query the openFDA drug label database by brand or generic name
+- **Medication list management** — Add medications with user-defined dosage and notes; data persisted to local storage
+- **Drug detail view** — Displays FDA-published purpose, indications, dosing instructions, warnings, and adverse reactions
+- **Interaction detection** — Identifies references to other tracked medications within FDA warning text and presents the matching excerpt
 
-## How Interaction Detection Works
+## API Reference
 
-For each medication, the app pulls the full FDA label text. When you open the detail view, it searches that med's warnings for the brand names, generic names, and significant active ingredients of the other meds in your list. A match means the FDA's own label calls out a specific drug-drug warning — for example, Tylenol's label saying "Ask a doctor or pharmacist before use if you are taking the blood thinning drug warfarin" matches if you have warfarin in your list.
+The application consumes a single external endpoint:
 
-This only catches interactions the FDA explicitly names in the label. It is not a replacement for a pharmacist or clinical interaction checker.
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `https://api.fda.gov/drug/label.json` | Returns FDA-published drug label data filtered by brand or generic name |
+
+No API key is required.
+
+## Environment Variables
+
+No environment variables are currently required. Future versions integrating authentication and cloud persistence will require Supabase configuration.
 
 ## Run Locally
 
-1. Clone the project
+1. Clone the repository
 
        git clone https://github.com/zerxelk/MedTracker.git
 
@@ -37,11 +48,15 @@ This only catches interactions the FDA explicitly names in the label. It is not 
        cd MedTracker
        npm install
 
-3. Start the dev server
+3. Start the development server
 
        npm run dev
 
-Open http://localhost:3000 in your browser.
+The application will be available at `http://localhost:3000`.
+
+## Disclaimer
+
+This software is provided for informational purposes only and does not constitute medical advice. Drug interaction detection is based on best-effort text matching against FDA label data and may not identify all clinically relevant interactions. Users should consult a licensed healthcare provider or pharmacist before making medication-related decisions.
 
 ## License
 

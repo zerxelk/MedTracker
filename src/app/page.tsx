@@ -51,7 +51,7 @@ export default function Home() {
                             <Pill className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-lg font-semibold text-slate-900 leading-tight">MedApp</h1>
+                            <h1 className="text-lg font-semibold text-slate-900 leading-tight">MedTracker</h1>
                             <p className="text-xs text-slate-500 leading-tight">
                                 Your personal medication tracker
                             </p>

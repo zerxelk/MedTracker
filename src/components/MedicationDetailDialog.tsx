@@ -20,12 +20,14 @@ import {
 } from 'lucide-react';
 import { detectInteractions } from '@/lib/interactions';
 import { ShieldAlert } from 'lucide-react';
+import { ScheduleTracker } from "@/components/ScheduleTracker";
 
 interface MedicationDetailDialogProps {
     medication: Medication | null;
     allMedications: Medication[];
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    onToggleDose: (medId: string, doseKey: string) => void;
 }
 
 export function MedicationDetailDialog({
@@ -33,6 +35,7 @@ export function MedicationDetailDialog({
                                            allMedications,
                                            open,
                                            onOpenChange,
+                                           onToggleDose,
                                        }: MedicationDetailDialogProps) {
     if (!medication) return null;
     const interactions = detectInteractions(medication, allMedications);
@@ -88,6 +91,14 @@ export function MedicationDetailDialog({
                         <span>{new Date(medication.addedAt).toLocaleDateString()}</span>
                     </div>
                 </div>
+
+                {/* Schedule tracker */}
+                {medication.schedule && (
+                    <ScheduleTracker
+                        medication={medication}
+                        onToggleDose={onToggleDose}
+                    />
+                )}
 
                 {/* Interactions with user's other meds */}
                 {interactions.length > 0 && (

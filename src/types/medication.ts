@@ -1,18 +1,35 @@
+export type ScheduleFrequency = 'once' | 'twice' | 'three_times' | 'four_times' | 'as_needed';
+
+export interface MedicationSchedule {
+    frequency: ScheduleFrequency;
+    durationDays?: number; // undefined = ongoing
+    startDate: string;     // ISO date string (YYYY-MM-DD)
+    instructions?: string; // e.g. "after meals", "with water"
+}
+
+export interface DoseLog {
+    // Key: "YYYY-MM-DD:slotIndex" → ISO timestamp when taken
+    // slotIndex is 0..n-1 within a day (0 = first dose, 1 = second, etc.)
+    [doseKey: string]: string;
+}
+
 export interface Medication {
-    id: string;              // unique id (we generate with crypto.randomUUID())
-    name: string;            // brand or generic name
-    dosage?: string;         // e.g. "500mg" — user-entered
-    notes?: string;          // user's personal notes
-    addedAt: string;         // ISO date string
-    fdaData?: FDADrugInfo;   // cached info from openFDA
+    id: string;
+    name: string;
+    dosage?: string;
+    notes?: string;
+    addedAt: string;
+    fdaData?: FDADrugInfo;
+    schedule?: MedicationSchedule;
+    doseLog?: DoseLog;
 }
 
 export interface FDADrugInfo {
     brandName?: string;
     genericName?: string;
     manufacturer?: string;
-    purpose?: string;        // what it's for
-    indications?: string;    // when to use it
+    purpose?: string;
+    indications?: string;
     warnings?: string;
     sideEffects?: string;
     dosageInfo?: string;

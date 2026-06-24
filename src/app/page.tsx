@@ -6,6 +6,7 @@ import {
     getMedications,
     addMedication,
     removeMedication,
+    toggleDose,
 } from '@/lib/storage';
 import { MedicationCard } from '@/components/MedicationCard';
 import { MedicationCardSkeleton } from '@/components/MedicationCardSkeleton';
@@ -15,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Pill, Plus, Sparkles } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { detectInteractions } from '@/lib/interactions';
+import { TodayOverview } from '@/components/TodayOverview';
 
 export default function Home() {
     const [meds, setMeds] = useState<Medication[]>([]);
@@ -41,13 +43,22 @@ export default function Home() {
         setDetailOpen(true);
     }
 
+    function handleToggleDose(medId: string, doseKey: string) {
+        const updated = toggleDose(medId, doseKey);
+        setMeds(updated);
+        // Also refresh selectedMed so the detail dialog shows the new dose state immediately
+        setSelectedMed((current) => {
+            if (!current || current.id !== medId) return current;
+            return updated.find((m) => m.id === medId) || current;
+        });
+    }
+
     // Count unique interaction pairs (so A↔B isn't counted twice)
     const totalInteractions = mounted
         ? (() => {
             const pairs = new Set<string>();
             for (const med of meds) {
                 for (const inter of detectInteractions(med, meds)) {
-                    // Build a canonical pair id (sorted, so A-B and B-A are the same)
                     const pairId = [med.id, inter.withMed.id].sort().join('|');
                     pairs.add(pairId);
                 }
@@ -66,8 +77,8 @@ export default function Home() {
                             <Pill className="h-4 w-4 text-stone-50" />
                         </div>
                         <span className="text-base font-semibold text-stone-900 tracking-tight">
-              MedTracker
-            </span>
+                            MedTracker
+                        </span>
                     </div>
                     <Button
                         onClick={() => setDialogOpen(true)}
@@ -82,7 +93,6 @@ export default function Home() {
 
             {/* Hero */}
             <section className="relative overflow-hidden border-b border-stone-200/60">
-                {/* Soft gradient mesh in the background */}
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-50/40 via-stone-50 to-amber-50/30 pointer-events-none" />
                 <div
                     className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-orange-100/40 blur-3xl pointer-events-none"
@@ -99,101 +109,103 @@ export default function Home() {
                         Powered by openFDA data
                     </div>
 
-                    <h1 className="text-4xl sm:text-5xl font-semibold text-stone-900 tracking-tight leading-[1.1] max-w-2xl">
-                        Your meds,
+                    <h1 className="text-5xl sm:text-7xl font-semibold text-stone-900 tracking-tight leading-[1.05] max-w-3xl">
+                        A med tracker
                         <br />
-                        <span className="text-stone-500">in one calm place.</span>
+                        <span className="text-stone-400">to know your meds.</span>
                     </h1>
 
-                    <p className="text-base sm:text-lg text-stone-600 mt-6 max-w-xl leading-relaxed">
-                        Track what you take. See what the FDA actually says about it. Get
-                        quietly warned when your medications warn about each other.
+                    <p className="text-base sm:text-lg text-stone-600 mt-8 max-w-xl leading-relaxed">
+                        Search the FDA database, track your daily doses, and get warned when your medications interact. All in one place.
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-3 mt-8">
-                        <Button
-                            onClick={() => setDialogOpen(true)}
-                            className="bg-stone-900 hover:bg-stone-800 text-stone-50 rounded-lg h-10 px-5"
-                        >
-                            <Plus className="h-4 w-4 mr-1.5" />
-                            Add medication
-                        </Button>
-                        {mounted && meds.length > 0 && (
-                            <div className="flex items-center gap-2 text-sm text-stone-600">
-                                <div className="h-1 w-1 rounded-full bg-stone-400" />
+                    {mounted && meds.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-3 mt-8 text-sm text-stone-600">
+                            <span>
                                 Tracking {meds.length} medication{meds.length === 1 ? '' : 's'}
-                                {totalInteractions > 0 && (
-                                    <>
-                                        <div className="h-1 w-1 rounded-full bg-stone-400" />
-                                        <span className="text-orange-700">
-                      {totalInteractions} interaction
-                                            {totalInteractions === 1 ? '' : 's'} detected
-                    </span>
-                                    </>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                            </span>
+                            {totalInteractions > 0 && (
+                                <>
+                                    <div className="h-1 w-1 rounded-full bg-stone-400" />
+                                    <span className="text-orange-700">
+                                        {totalInteractions} interaction
+                                        {totalInteractions === 1 ? '' : 's'} detected
+                                    </span>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </div>
             </section>
 
             {/* Main content */}
-            <main className="max-w-5xl mx-auto px-6 py-12">
-                <div className="mb-6 flex items-baseline justify-between">
-                    <h2 className="text-lg font-semibold text-stone-900 tracking-tight">
-                        My medications
-                    </h2>
-                    {mounted && meds.length > 0 && (
-                        <span className="text-xs text-stone-500">
-              Saved on this device
-            </span>
+            <main className="max-w-5xl mx-auto px-6 py-12 space-y-12">
+                {/* Today's doses */}
+                {mounted && meds.some((m) => m.schedule) && (
+                    <TodayOverview
+                        medications={meds}
+                        onToggleDose={handleToggleDose}
+                        onViewMed={handleView}
+                    />
+                )}
+
+                <div>
+                    <div className="mb-6 flex items-baseline justify-between">
+                        <h2 className="text-lg font-semibold text-stone-900 tracking-tight">
+                            My medications
+                        </h2>
+                        {mounted && meds.length > 0 && (
+                            <span className="text-xs text-stone-500">
+                                Saved on this device
+                            </span>
+                        )}
+                    </div>
+
+                    {!mounted ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <MedicationCardSkeleton />
+                            <MedicationCardSkeleton />
+                            <MedicationCardSkeleton />
+                        </div>
+                    ) : meds.length === 0 ? (
+                        <div className="text-center py-20 px-6 rounded-2xl bg-white border border-stone-200/80">
+                            <div className="inline-flex rounded-2xl bg-stone-100 p-3.5 mb-5">
+                                <Pill className="h-6 w-6 text-stone-600" />
+                            </div>
+                            <h3 className="text-stone-900 font-semibold text-base">
+                                Nothing here yet
+                            </h3>
+                            <p className="text-sm text-stone-500 mt-1.5 mb-6 max-w-sm mx-auto">
+                                Search a medication to add it. We&rsquo;ll pull the FDA label
+                                data and watch for interactions automatically.
+                            </p>
+                            <Button
+                                onClick={() => setDialogOpen(true)}
+                                className="bg-stone-900 hover:bg-stone-800 text-stone-50 rounded-lg"
+                            >
+                                <Plus className="h-4 w-4 mr-1" />
+                                Add your first medication
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <AnimatePresence mode="popLayout">
+                                {meds.map((med, i) => (
+                                    <MedicationCard
+                                        key={med.id}
+                                        medication={med}
+                                        index={i}
+                                        onView={handleView}
+                                        onDelete={handleDelete}
+                                    />
+                                ))}
+                            </AnimatePresence>
+                        </div>
                     )}
                 </div>
 
-                {!mounted ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <MedicationCardSkeleton />
-                        <MedicationCardSkeleton />
-                        <MedicationCardSkeleton />
-                    </div>
-                ) : meds.length === 0 ? (
-                    <div className="text-center py-20 px-6 rounded-2xl bg-white border border-stone-200/80">
-                        <div className="inline-flex rounded-2xl bg-stone-100 p-3.5 mb-5">
-                            <Pill className="h-6 w-6 text-stone-600" />
-                        </div>
-                        <h3 className="text-stone-900 font-semibold text-base">
-                            Nothing here yet
-                        </h3>
-                        <p className="text-sm text-stone-500 mt-1.5 mb-6 max-w-sm mx-auto">
-                            Search a medication to add it. We&rsquo;ll pull the FDA label
-                            data and watch for interactions automatically.
-                        </p>
-                        <Button
-                            onClick={() => setDialogOpen(true)}
-                            className="bg-stone-900 hover:bg-stone-800 text-stone-50 rounded-lg"
-                        >
-                            <Plus className="h-4 w-4 mr-1" />
-                            Add your first medication
-                        </Button>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <AnimatePresence mode="popLayout">
-                            {meds.map((med, i) => (
-                                <MedicationCard
-                                    key={med.id}
-                                    medication={med}
-                                    index={i}
-                                    onView={handleView}
-                                    onDelete={handleDelete}
-                                />
-                            ))}
-                        </AnimatePresence>
-                    </div>
-                )}
-
-                {/* Disclaimer — moved to bottom, softer */}
-                <p className="text-xs text-stone-400 text-center mt-16 max-w-md mx-auto leading-relaxed">
+                {/* Disclaimer */}
+                <p className="text-xs text-stone-400 text-center max-w-md mx-auto leading-relaxed">
                     For informational tracking only. Not medical advice. Interaction
                     detection is best-effort and based on FDA label text. Always consult
                     a healthcare provider.
@@ -210,6 +222,7 @@ export default function Home() {
                 allMedications={meds}
                 open={detailOpen}
                 onOpenChange={setDetailOpen}
+                onToggleDose={handleToggleDose}
             />
         </div>
     );

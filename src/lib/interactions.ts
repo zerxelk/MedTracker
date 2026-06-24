@@ -1,4 +1,3 @@
-// src/lib/interactions.ts
 import { Medication } from '@/types/medication';
 
 export interface DetectedInteraction {
@@ -7,7 +6,11 @@ export interface DetectedInteraction {
     excerpt: string;
 }
 
-// Common pharmacology suffixes / form words that aren't useful for matching
+export interface SameIngredientWarning {
+    ingredient: string;
+    medications: Medication[];
+}
+
 const STOPWORDS = new Set([
     'sodium', 'hydrochloride', 'hcl', 'citrate', 'sulfate', 'phosphate',
     'tablet', 'tablets', 'capsule', 'capsules', 'oral', 'extra', 'strength',
@@ -16,12 +19,6 @@ const STOPWORDS = new Set([
     'ointment', 'gel', 'spray', 'drops', 'chewable', 'coated',
 ]);
 
-/**
- * Build a list of search terms for a given med:
- * - the full brand name, generic name, and user-given name
- * - plus each individual significant word from those names
- *   (e.g. "Warfarin Sodium" also matches just "warfarin")
- */
 function getCandidateTerms(med: Medication): string[] {
     const sources = [
         med.fdaData?.brandName,
@@ -33,11 +30,8 @@ function getCandidateTerms(med: Medication): string[] {
 
     for (const source of sources) {
         const lower = source.toLowerCase().trim();
-
-        // Add the full term if it's meaningful
         if (lower.length > 3) terms.add(lower);
 
-        // Also add each significant word from multi-word names
         const words = lower.split(/\s+/);
         if (words.length > 1) {
             for (const word of words) {
@@ -75,12 +69,66 @@ export function detectInteractions(
                     matchedTerm: term,
                     excerpt,
                 });
-                break; // one match per other-med
+                break;
             }
         }
     }
 
     return results;
+}
+
+/**
+ * Detect medications that share the same active ingredient.
+ * Catches "double-dosing" — a common cause of acetaminophen overdose.
+ * For example, taking Tylenol AND a cold medicine both containing acetaminophen.
+ *
+ * Returns one warning per ingredient group, listing all meds that share it.
+ */
+export function detectSameIngredientWarnings(
+    allMeds: Medication[]
+): SameIngredientWarning[] {
+    const groups = new Map<string, Medication[]>();
+
+    for (const med of allMeds) {
+        const ingredient = med.fdaData?.genericName?.toLowerCase().trim();
+        if (!ingredient) continue;
+
+        // Normalize: strip pharmacological suffixes for grouping
+        const normalized = normalizeIngredient(ingredient);
+        if (!normalized) continue;
+
+        const existing = groups.get(normalized) || [];
+        existing.push(med);
+        groups.set(normalized, existing);
+    }
+
+    // Only return groups with 2+ medications
+    const warnings: SameIngredientWarning[] = [];
+    for (const [ingredient, meds] of groups.entries()) {
+        if (meds.length >= 2) {
+            warnings.push({ ingredient, medications: meds });
+        }
+    }
+
+    return warnings;
+}
+
+/**
+ * Normalize an ingredient name for comparison.
+ * "Acetaminophen" -> "acetaminophen"
+ * "Warfarin Sodium" -> "warfarin" (strips salt suffix)
+ * "Ibuprofen" -> "ibuprofen"
+ */
+function normalizeIngredient(ingredient: string): string {
+    const words = ingredient
+        .toLowerCase()
+        .split(/\s+/)
+        .filter((w) => w.length > 0 && !STOPWORDS.has(w));
+
+    if (words.length === 0) return '';
+    // For multi-word generics, use the first significant word
+    // (e.g. "warfarin sodium" -> "warfarin")
+    return words[0];
 }
 
 function extractSentence(text: string, index: number): string {

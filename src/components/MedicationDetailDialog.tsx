@@ -18,8 +18,9 @@ import {
     FileText,
     StickyNote,
     ShieldAlert,
+    Layers,
 } from 'lucide-react';
-import { detectInteractions } from '@/lib/interactions';
+import { detectInteractions, detectSameIngredientWarnings } from '@/lib/interactions';
 import { ScheduleTracker } from "@/components/ScheduleTracker";
 
 interface MedicationDetailDialogProps {
@@ -39,6 +40,14 @@ export function MedicationDetailDialog({
                                        }: MedicationDetailDialogProps) {
     if (!medication) return null;
     const interactions = detectInteractions(medication, allMedications);
+
+    // Find same-ingredient meds that include the currently viewed med
+    const sameIngredientWarning = detectSameIngredientWarnings(allMedications).find(
+        (w) => w.medications.some((m) => m.id === medication.id)
+    );
+    const otherMedsWithSameIngredient = sameIngredientWarning
+        ? sameIngredientWarning.medications.filter((m) => m.id !== medication.id)
+        : [];
 
     const fda = medication.fdaData;
     const displayName =
@@ -99,7 +108,42 @@ export function MedicationDetailDialog({
                         onToggleDose={onToggleDose}
                     />
                 )}
-
+                {/* Same-ingredient warning */}
+                {otherMedsWithSameIngredient.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="rounded-lg border border-orange-300 dark:border-orange-900/60 bg-orange-50 dark:bg-orange-950/30 p-4"
+                    >
+                        <div className="flex items-center gap-2 mb-2">
+                            <Layers className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                            <h3 className="font-medium text-sm text-stone-900 dark:text-stone-50">
+                                Possible double-dosing
+                            </h3>
+                        </div>
+                        <p className="text-sm text-stone-700 dark:text-stone-300 mb-3 leading-relaxed">
+                            This medication contains{' '}
+                            <span className="font-medium capitalize">
+                                {sameIngredientWarning?.ingredient}
+                            </span>
+                            , which is also in:
+                        </p>
+                        <ul className="space-y-1.5 mb-3">
+                            {otherMedsWithSameIngredient.map((m) => (
+                                <li
+                                    key={m.id}
+                                    className="text-sm text-stone-800 dark:text-stone-200 capitalize bg-white dark:bg-stone-900/40 rounded-md border border-orange-100 dark:border-orange-900/30 px-3 py-2"
+                                >
+                                    {(m.fdaData?.brandName || m.fdaData?.genericName || m.name).toLowerCase()}
+                                </li>
+                            ))}
+                        </ul>
+                        <p className="text-xs text-orange-900/70 dark:text-orange-300/70 italic">
+                            Taking medications with the same active ingredient at the same time can lead to accidental overdose. Verify with your pharmacist before combining.
+                        </p>
+                    </motion.div>
+                )}
                 {/* Interactions */}
                 {interactions.length > 0 && (
                     <motion.div

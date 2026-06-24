@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "MedTracker",
     description:
         "A med tracker that pulls FDA label data and detects interactions between your medications.",
-    url: "https://medtracker-flax.vercel.app",
+    url: "https://medtracker-zerx.vercel.app",
     siteName: "MedTracker",
     type: "website",
   },
@@ -35,17 +35,19 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
+                                     children,
+                                   }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <html
+          lang="en"
+          className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      >
+      <body className="min-h-full flex flex-col">
+      {children}
       <Analytics />
-    </html>
+      </body>
+      </html>
   );
 }

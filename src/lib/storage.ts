@@ -49,3 +49,8 @@ export function toggleDose(medId: string, doseKey: string): Medication[] {
     saveMedications(updated);
     return updated;
 }
+export function clearAllMedications(): Medication[] {
+    if (typeof window === 'undefined') return [];
+    localStorage.removeItem(STORAGE_KEY);
+    return [];
+}

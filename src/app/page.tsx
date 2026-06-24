@@ -7,13 +7,14 @@ import {
     addMedication,
     removeMedication,
     toggleDose,
+    clearAllMedications,
 } from '@/lib/storage';
 import { MedicationCard } from '@/components/MedicationCard';
 import { MedicationCardSkeleton } from '@/components/MedicationCardSkeleton';
 import { AddMedicationDialog } from '@/components/AddMedicationDialog';
 import { MedicationDetailDialog } from '@/components/MedicationDetailDialog';
 import { Button } from '@/components/ui/button';
-import { Pill, Plus, Sparkles } from 'lucide-react';
+import { Pill, Plus, Sparkles, ChevronDown, Trash2, Settings as SettingsIcon } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { detectInteractions } from '@/lib/interactions';
 import { TodayOverview } from '@/components/TodayOverview';
@@ -24,6 +25,8 @@ export default function Home() {
     const [detailOpen, setDetailOpen] = useState(false);
     const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
     const [mounted, setMounted] = useState(false);
+    const [howItWorksOpen, setHowItWorksOpen] = useState(false);
+    const [settingsOpen, setSettingsOpen] = useState(false);
 
     useEffect(() => {
         setMeds(getMedications());
@@ -46,14 +49,19 @@ export default function Home() {
     function handleToggleDose(medId: string, doseKey: string) {
         const updated = toggleDose(medId, doseKey);
         setMeds(updated);
-        // Also refresh selectedMed so the detail dialog shows the new dose state immediately
         setSelectedMed((current) => {
             if (!current || current.id !== medId) return current;
             return updated.find((m) => m.id === medId) || current;
         });
     }
 
-    // Count unique interaction pairs (so A↔B isn't counted twice)
+    function handleClearAll() {
+        if (confirm('Delete all medications and dose history? This cannot be undone.')) {
+            setMeds(clearAllMedications());
+            setSettingsOpen(false);
+        }
+    }
+
     const totalInteractions = mounted
         ? (() => {
             const pairs = new Set<string>();
@@ -80,14 +88,25 @@ export default function Home() {
                             MedTracker
                         </span>
                     </div>
-                    <Button
-                        onClick={() => setDialogOpen(true)}
-                        size="sm"
-                        className="bg-stone-900 hover:bg-stone-800 text-stone-50 rounded-lg"
-                    >
-                        <Plus className="h-4 w-4 mr-1" />
-                        Add medication
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            onClick={() => setSettingsOpen(true)}
+                            size="sm"
+                            variant="ghost"
+                            className="text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg"
+                            aria-label="Settings"
+                        >
+                            <SettingsIcon className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            onClick={() => setDialogOpen(true)}
+                            size="sm"
+                            className="bg-stone-900 hover:bg-stone-800 text-stone-50 rounded-lg"
+                        >
+                            <Plus className="h-4 w-4 mr-1" />
+                            Add medication
+                        </Button>
+                    </div>
                 </div>
             </header>
 
@@ -149,6 +168,7 @@ export default function Home() {
                     />
                 )}
 
+                {/* Medications grid */}
                 <div>
                     <div className="mb-6 flex items-baseline justify-between">
                         <h2 className="text-lg font-semibold text-stone-900 tracking-tight">
@@ -204,26 +224,145 @@ export default function Home() {
                     )}
                 </div>
 
-                {/* Disclaimer */}
-                <p className="text-xs text-stone-400 text-center max-w-md mx-auto leading-relaxed">
-                    For informational tracking only. Not medical advice. Interaction
-                    detection is best-effort and based on FDA label text. Always consult
-                    a healthcare provider.
-                </p>
+                {/* How interaction detection works */}
+                <div className="rounded-2xl border border-stone-200/80 bg-white overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => setHowItWorksOpen((o) => !o)}
+                        className="w-full flex items-center justify-between p-5 text-left hover:bg-stone-50 transition-colors"
+                    >
+                        <div>
+                            <h3 className="text-sm font-semibold text-stone-900">
+                                How interaction detection works
+                            </h3>
+                            <p className="text-xs text-stone-500 mt-0.5">
+                                A quick look under the hood
+                            </p>
+                        </div>
+                        <ChevronDown
+                            className={`h-4 w-4 text-stone-500 transition-transform ${
+                                howItWorksOpen ? 'rotate-180' : ''
+                            }`}
+                        />
+                    </button>
+                    {howItWorksOpen && (
+                        <div className="px-5 pb-5 pt-1 text-sm text-stone-600 leading-relaxed space-y-3 border-t border-stone-100">
+                            <p>
+                                For each medication you add, MedTracker pulls the full FDA
+                                label data from the openFDA Drug Label API — including the
+                                warnings section that drug companies are required by law to
+                                publish.
+                            </p>
+                            <p>
+                                When you open a medication, the app searches that med&rsquo;s
+                                FDA warnings for the names of every other medication in your
+                                list (brand names, generic names, and active ingredients).
+                                When it finds a match, it surfaces the exact sentence from
+                                the FDA label as evidence.
+                            </p>
+                            <p>
+                                This catches the interactions the FDA explicitly names in
+                                label documentation, but it cannot catch every clinically
+                                relevant interaction. It is not a substitute for a pharmacist
+                                or licensed clinical decision support software.
+                            </p>
+                        </div>
+                    )}
+                </div>
             </main>
 
-            <AddMedicationDialog
-                open={dialogOpen}
-                onOpenChange={setDialogOpen}
-                onAdd={handleAdd}
-            />
-            <MedicationDetailDialog
-                medication={selectedMed}
-                allMedications={meds}
-                open={detailOpen}
-                onOpenChange={setDetailOpen}
-                onToggleDose={handleToggleDose}
-            />
+            {/* Footer */}
+            <footer className="border-t border-stone-200/60 bg-stone-50/50">
+                <div className="max-w-5xl mx-auto px-6 py-8 space-y-4">
+                    <p className="text-xs text-stone-500 text-center max-w-md mx-auto leading-relaxed">
+                        For informational tracking only. Not medical advice. Interaction
+                        detection is best-effort and based on FDA label text. Always consult
+                        a healthcare provider.
+                    </p>
+                    <div className="flex items-center justify-center gap-4 text-xs text-stone-400">
+                        <span>&copy; {new Date().getFullYear()} MedTracker</span>
+                        <span>·</span>
+                    <a
+                        href="https://github.com/zerxelk/MedTracker"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-stone-700 transition-colors"
+                    >
+                        GitHub
+                    </a>
+                    <span>·</span>
+                    <a
+                    href="https://github.com/zerxelk/MedTracker/blob/main/LICENSE"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-stone-700 transition-colors"
+                    >
+                    MIT License
+                </a>
         </div>
-    );
+</div>
+</footer>
+
+
+    <AddMedicationDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onAdd={handleAdd}
+    />
+    <MedicationDetailDialog
+        medication={selectedMed}
+        allMedications={meds}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        onToggleDose={handleToggleDose}
+    />
+
+    {/* Settings dialog */}
+    {settingsOpen && (
+        <div
+            className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+            onClick={() => setSettingsOpen(false)}
+        >
+            <div
+                className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <h2 className="text-lg font-semibold text-stone-900 mb-1">Settings</h2>
+                <p className="text-sm text-stone-500 mb-6">
+                    Manage your data
+                </p>
+
+                <div className="rounded-xl border border-red-200 bg-red-50/50 p-4">
+                    <h3 className="text-sm font-medium text-stone-900 mb-1">
+                        Clear all data
+                    </h3>
+                    <p className="text-xs text-stone-600 mb-3 leading-relaxed">
+                        Permanently delete all medications and dose history from
+                        this device. Cannot be undone.
+                    </p>
+                    <Button
+                        onClick={handleClearAll}
+                        size="sm"
+                        variant="outline"
+                        className="border-red-300 text-red-700 hover:bg-red-100 hover:text-red-800"
+                    >
+                        <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                        Delete everything
+                    </Button>
+                </div>
+
+                <div className="flex justify-end mt-6">
+                    <Button
+                        onClick={() => setSettingsOpen(false)}
+                        variant="ghost"
+                        size="sm"
+                    >
+                        Close
+                    </Button>
+                </div>
+            </div>
+        </div>
+    )}
+</div>
+);
 }

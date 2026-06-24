@@ -13,8 +13,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MedTracker",
-  description: "Personal medication tracker with FDA data and interaction detection",
+  metadataBase: new URL("https://medtracker-zerx.vercel.app"),
+  title: "MedTracker — A med tracker to know your meds",
+  description:
+      "Search the FDA database, track your daily doses, and get warned when your medications interact. All in one place.",
+  openGraph: {
+    title: "MedTracker",
+    description:
+        "A med tracker that pulls FDA label data and detects interactions between your medications.",
+    url: "https://medtracker-flax.vercel.app",
+    siteName: "MedTracker",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MedTracker",
+    description:
+        "A med tracker that pulls FDA label data and detects interactions between your medications.",
+  },
 };
 
 export default function RootLayout({

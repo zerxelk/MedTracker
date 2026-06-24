@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Medication } from '@/types/medication';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Pill, Trash2 } from 'lucide-react';
+import { Pill, Trash2, ArrowUpRight } from 'lucide-react';
 
 interface MedicationCardProps {
     medication: Medication;
@@ -33,41 +33,49 @@ export function MedicationCard({
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.25, delay: index * 0.05 }}
         >
-            <Card className="group relative cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-blue-200">
-                <CardHeader className="pb-3">
+            <Card
+                onClick={() => onView(medication)}
+                className="group relative cursor-pointer bg-white border-stone-200/80 rounded-2xl shadow-none hover:shadow-md hover:border-stone-300 transition-all"
+            >
+                <CardHeader className="pb-2.5">
                     <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                            <div className="rounded-lg bg-blue-50 p-2 shrink-0">
-                                <Pill className="h-4 w-4 text-blue-600" />
+                        <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="rounded-xl bg-stone-100 p-2 shrink-0">
+                                <Pill className="h-4 w-4 text-stone-600" />
                             </div>
-                            <CardTitle className="text-base truncate capitalize">
+                            <CardTitle className="text-base font-semibold text-stone-900 truncate capitalize tracking-tight">
                                 {displayName.toLowerCase()}
                             </CardTitle>
                         </div>
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-600 hover:bg-red-50"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-stone-400 hover:text-red-600 hover:bg-red-50 -mr-1"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onDelete(medication.id);
                             }}
                             aria-label="Delete medication"
                         >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                     </div>
                 </CardHeader>
-                <CardContent onClick={() => onView(medication)} className="space-y-2">
+                <CardContent className="space-y-2">
                     {medication.dosage && (
-                        <p className="text-sm text-slate-600">{medication.dosage}</p>
+                        <p className="text-sm text-stone-700 font-medium">
+                            {medication.dosage}
+                        </p>
                     )}
                     {medication.fdaData?.purpose && (
-                        <p className="text-xs text-slate-500 line-clamp-2">
+                        <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed">
                             {medication.fdaData.purpose}
                         </p>
                     )}
-                    <p className="text-xs text-blue-600 font-medium pt-1">View details →</p>
+                    <div className="flex items-center gap-1 text-xs text-stone-600 font-medium pt-2 group-hover:gap-1.5 transition-all">
+                        View details
+                        <ArrowUpRight className="h-3 w-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </div>
                 </CardContent>
             </Card>
         </motion.div>
